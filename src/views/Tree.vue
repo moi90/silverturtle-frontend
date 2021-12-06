@@ -1,32 +1,30 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app width="300">
-      <!--<v-row>
-      <v-text-field
+    <v-system-bar app>System Bar</v-system-bar>
+    <v-navigation-drawer v-model="drawer" app width="300" fluid>
+      <v-treeview
+        dense
+        activatable
+        :items="tree"
+        :open.sync="open_nodes"
+        :active.sync="active_nodes"
+        return-object
+        fill-height
+      >
+        <template v-slot:prepend="{}">
+          <v-icon> mdi-tag-outline </v-icon>
+        </template>
+      </v-treeview>
+      <v-footer app> Tags </v-footer>
+    </v-navigation-drawer>
+    <v-app-bar app
+      ><v-text-field
         label="Identification"
         :value="identification"
         single-line
         full-width
-      ></v-text-field>
-    </v-row>-->
-      <v-col cols="3">
-        <v-treeview
-          dense
-          activatable
-          :items="tree"
-          :open.sync="open_nodes"
-          :active.sync="active_nodes"
-          return-object
-          fill-height
-        >
-          <template v-slot:prepend="{}">
-            <v-icon> mdi-tag-outline </v-icon>
-          </template>
-        </v-treeview>
-        <v-divider></v-divider>
-        Tags
-      </v-col>
-    </v-navigation-drawer>
+      ></v-text-field
+    ></v-app-bar>
     <v-main>
       <v-col cols="3" fill-height> Object Pane </v-col>
     </v-main>

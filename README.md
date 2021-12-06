@@ -1,4 +1,4 @@
-# frontend
+# SilverTurtle
 
 ## Project setup
 ```
