@@ -1,6 +1,6 @@
 <template>
-  <v-container fill-height>
-    <v-navigation-drawer>
+  <v-app>
+    <v-navigation-drawer v-model="drawer" app width="300">
       <!--<v-row>
       <v-text-field
         label="Identification"
@@ -27,8 +27,10 @@
         Tags
       </v-col>
     </v-navigation-drawer>
-    <v-col cols="3" fill-height> Object Pane </v-col>
-  </v-container>
+    <v-main>
+      <v-col cols="3" fill-height> Object Pane </v-col>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
