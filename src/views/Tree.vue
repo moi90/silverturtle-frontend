@@ -1,21 +1,75 @@
 <template>
   <v-app>
     <v-system-bar app>System Bar</v-system-bar>
-    <v-navigation-drawer v-model="drawer" app width="300" fluid>
-      <v-treeview
-        dense
-        activatable
-        :items="tree"
-        :open.sync="open_nodes"
-        :active.sync="active_nodes"
-        return-object
-        fill-height
-      >
-        <template v-slot:prepend="{}">
-          <v-icon> mdi-tag-outline </v-icon>
-        </template>
-      </v-treeview>
-      <v-footer app> Tags </v-footer>
+    <v-navigation-drawer id="id-drawer" app width="300" flex permanent>
+      <!-- 
+      <div style="flex: 1">Tags</div> -->
+      <v-expansion-panels multiple accordion v-model="expanded_id_panels">
+        <v-expansion-panel>
+          <v-expansion-panel-header>Taxonomy</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-treeview
+              dense
+              activatable
+              :items="taxonomy"
+              :open.sync="open_nodes"
+              :active.sync="active_nodes"
+              return-object
+              open-all
+            >
+              <template v-slot:prepend="{ open }">
+                <v-icon>
+                  {{ open ? "mdi-folder-open" : "mdi-folder" }}
+                </v-icon>
+              </template>
+            </v-treeview>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-expansion-panel>
+          <v-expansion-panel-header>Tags</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-btn-toggle v-if="false" />
+            <v-treeview
+              dense
+              :items="tags"
+              _:open.sync="open_tags"
+              _:active.sync="active_tags"
+              return-object
+            >
+              <template v-slot:prepend="{ item }">
+                <v-icon>
+                  {{
+                    item.state == "rejected"
+                      ? "mdi-tag-off"
+                      : item.state == "selected"
+                      ? "mdi-tag"
+                      : "mdi-tag-outline"
+                  }}
+                </v-icon>
+              </template>
+              <template v-slot:append="{ item }">
+                <v-btn-toggle v-model="item.state">
+                  <v-btn icon small color="green" value="selected">
+                    <v-icon>mdi-check</v-icon>
+                  </v-btn>
+                  <v-btn icon small color="red" value="rejected">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                  <div class="v-btn"
+                    icon
+                    small
+                    v-if="item.star"
+                    value="__star"
+                    v-on:click="addTag(item)"
+                  >
+                    <v-icon>mdi-asterisk</v-icon>
+                  </v-btn>
+                </v-btn-toggle>
+              </template>
+            </v-treeview>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-navigation-drawer>
     <v-app-bar app
       ><v-text-field
@@ -32,6 +86,8 @@
 </template>
 
 <script>
+import Vue from "vue";
+import taxonomy from "../taxonomy.json";
 export default {
   name: "Tree",
   methods: {
@@ -48,6 +104,15 @@ export default {
         this.open_nodes.push(node);
       }
     },
+    addTag(item) {
+      var state = item.state;
+      console.log(item.state);
+
+      // Reset state to previous value
+      Vue.nextTick(function () {
+        item.state = state;
+      });
+    },
   },
   watch: {
     active_nodes: function () {
@@ -55,81 +120,76 @@ export default {
     },
   },
   data: () => ({
+    expanded_id_panels: [0, 1],
     open_nodes: [],
     active_nodes: [],
     identification: "",
-    tree: [
+    taxonomy: taxonomy.children,
+    tags: [
+      { id: "badfocus", name: "badfocus" },
       {
-        id: 1,
-        name: "Applications :",
-        children: [
-          { id: 2, name: "Calendar : app" },
-          { id: 3, name: "Chrome : app" },
-          { id: 4, name: "Webstorm : app" },
-        ],
+        id: "like",
+        name: "like",
+        star: true,
       },
       {
-        id: 5,
-        name: "Documents :",
+        id: "stage",
+        name: "stage",
         children: [
+          { id: "stage:egg", name: ":egg" },
           {
-            id: 6,
-            name: "vuetify :",
-            children: [
-              {
-                id: 7,
-                name: "src :",
-                children: [
-                  { id: 8, name: "index : ts" },
-                  { id: 9, name: "bootstrap : ts" },
-                ],
-              },
-            ],
+            id: "stage:nauplius",
+            name: ":nauplius",
+            children: [{ id: "stage:nauplius:1", name: ":1" }],
           },
-          {
-            id: 10,
-            name: "material2 :",
-            children: [
-              {
-                id: 11,
-                name: "src :",
-                children: [
-                  { id: 12, name: "v-btn : ts" },
-                  { id: 13, name: "v-card : ts" },
-                  { id: 14, name: "v-window : ts" },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 15,
-        name: "Downloads :",
-        children: [
-          { id: 16, name: "October : pdf" },
-          { id: 17, name: "November : pdf" },
-          { id: 18, name: "Tutorial : html" },
-        ],
-      },
-      {
-        id: 19,
-        name: "Videos :",
-        children: [
-          {
-            id: 20,
-            name: "Tutorials :",
-            children: [
-              { id: 21, name: "Basic layouts : mp4" },
-              { id: 22, name: "Advanced techniques : mp4" },
-              { id: 23, name: "All about app : dir" },
-            ],
-          },
-          { id: 24, name: "Intro : mov" },
-          { id: 25, name: "Conference introduction : avi" },
         ],
       },
     ],
   }),
 };
 </script>
+
+<style>
+/* Behavior of accordeon panels */
+#id-drawer .v-navigation-drawer__content {
+  display: flex;
+  flex-direction: column;
+}
+#id-drawer .v-expansion-panels {
+  flex-direction: column;
+  justify-content: start;
+  flex: 1;
+}
+#id-drawer .v-expansion-panel {
+  flex: 0;
+  display: flex;
+  flex-direction: column;
+}
+#id-drawer .v-expansion-panel.v-expansion-panel--active {
+  flex: 1;
+}
+#id-drawer .v-expansion-panel-content {
+  flex: 1;
+  position: relative;
+}
+#id-drawer .v-expansion-panel-content__wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Make treeview scrollable*/
+#id-drawer .v-treeview-node__label {
+  overflow: initial;
+  text-overflow: initial;
+}
+
+#id-drawer .v-treeview {
+  width: max-content;
+}
+</style>
